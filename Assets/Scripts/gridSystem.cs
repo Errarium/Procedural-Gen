@@ -1,22 +1,28 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO.Compression;
+using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 
-public class gridSystem : MonoBehaviour
+public class GridSystem : MonoBehaviour
 {
-    [SerializeField] private int sizeX = 10;
-    [SerializeField] private int sizeZ = 10;
-    [SerializeField] private GameObject room;
-    // Start is called before the first frame update
+    [SerializeField] private int worldSize = 25;
+    [SerializeField] private GameObject prefab;
+    public float amp=5f;
+    public float freq=10f;
+
     void Start()
     {
-        for (int i = 0; i < sizeX; i++)
+        for (int x = 0; x < worldSize; x++)
         {
-            for (int j = 0; j < sizeZ; j++)
+            for (int z = 0; z < worldSize; z++)
             {
-                Instantiate(room, new Vector3(i * 2f, 0, j * 2f), Quaternion.identity);
+                Vector3 pos = new Vector3(x - worldSize/2, Mathf.PerlinNoise(x/freq, z/freq) * amp, z-worldSize/2);
+                GameObject room = Instantiate(prefab, pos, Quaternion.identity);
+
+                room.transform.SetParent(this.transform);
             }
         }
     }
-
 }
