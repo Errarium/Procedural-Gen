@@ -18,7 +18,7 @@ public class GridSystem : MonoBehaviour
         {
             for (int z = 0; z < worldSize; z++)
             {
-                Vector3 pos = new Vector3(x - worldSize/2, Mathf.PerlinNoise(x/freq, z/freq) * amp, z-worldSize/2);
+                Vector3 pos = new Vector3(x - worldSize/2 , Mathf.PerlinNoise(x/freq, z/freq) * amp, z-worldSize/2);
                 GameObject room = Instantiate(prefab, pos, Quaternion.identity);
 
                 room.transform.SetParent(this.transform);

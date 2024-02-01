@@ -21,11 +21,11 @@ public class WaveFunction : MonoBehaviour
 
     void InitializeGrid()
     {
-        for (int y = 0; y < dimensions; y++)
+        for (int z = 0; z < dimensions; z++)
         {
             for (int x = 0; x < dimensions; x++)
             {
-                Cell newCell = Instantiate(cellObj, new Vector2(x, y), Quaternion.identity);
+                Cell newCell = Instantiate(cellObj, new Vector3(x, 1, z), Quaternion.identity);
                 newCell.CreateCell(false, tileObjects);
                 gridComponents.Add(newCell);
             }
@@ -85,11 +85,11 @@ public class WaveFunction : MonoBehaviour
     {
         List<Cell> newGenerationCell = new List<Cell>(gridComponents);
 
-        for (int y = 0; y < dimensions; y++)
+        for (int z = 0; z < dimensions; z++)
         {
             for (int x = 0; x < dimensions; x++)
             {
-                var index = x + y * dimensions;
+                var index = x + z * dimensions;
                 if (gridComponents[index].collapsed)
                 {
                     Debug.Log("called");
@@ -104,9 +104,9 @@ public class WaveFunction : MonoBehaviour
                     }
 
                     //update above
-                    if (y > 0)
+                    if (z > 0)
                     {
-                        Cell up = gridComponents[x + (y - 1) * dimensions];
+                        Cell up = gridComponents[x + (z - 1) * dimensions];
                         List<Tile> validOptions = new List<Tile>();
 
                         foreach (Tile possibleOptions in up.tileOptions)
@@ -123,7 +123,7 @@ public class WaveFunction : MonoBehaviour
                     //update right
                     if (x < dimensions - 1)
                     {
-                        Cell right = gridComponents[x + 1 + y * dimensions];
+                        Cell right = gridComponents[x + 1 + z * dimensions];
                         List<Tile> validOptions = new List<Tile>();
 
                         foreach (Tile possibleOptions in right.tileOptions)
@@ -138,9 +138,9 @@ public class WaveFunction : MonoBehaviour
                     }
 
                     //look down
-                    if (y < dimensions - 1)
+                    if (z < dimensions - 1)
                     {
-                        Cell down = gridComponents[x + (y + 1) * dimensions];
+                        Cell down = gridComponents[x + (z + 1) * dimensions];
                         List<Tile> validOptions = new List<Tile>();
 
                         foreach (Tile possibleOptions in down.tileOptions)
@@ -157,7 +157,7 @@ public class WaveFunction : MonoBehaviour
                     //look left
                     if (x > 0)
                     {
-                        Cell left = gridComponents[x - 1 + y * dimensions];
+                        Cell left = gridComponents[x - 1 + z * dimensions];
                         List<Tile> validOptions = new List<Tile>();
 
                         foreach (Tile possibleOptions in left.tileOptions)
