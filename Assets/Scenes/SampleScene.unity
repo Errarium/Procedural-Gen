@@ -152,9 +152,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d8bf3a3a24bd7e45843bb7ad7082b2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sizeX: 10
-  sizeZ: 10
-  room: {fileID: 3593349803396476467, guid: 279cb34b436106349a4f10d3ac071cda, type: 3}
+  worldSize: 25
+  prefab: {fileID: 3593349803396476467, guid: 279cb34b436106349a4f10d3ac071cda, type: 3}
+  amp: 3
+  freq: 15
 --- !u!4 &452835419
 Transform:
   m_ObjectHideFlags: 0
