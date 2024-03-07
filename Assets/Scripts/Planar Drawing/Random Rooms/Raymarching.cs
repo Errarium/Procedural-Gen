@@ -3,11 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEngine;
-
-public class RandomRooms : MonoBehaviour
+public class Raymarching : MonoBehaviour
 {
-    [SerializeField] private int worldSize = 10;
+        [SerializeField] private int worldSize = 10;
     [SerializeField] private GameObject prefab;
     [SerializeField] private int maxLenght = 3;
     [SerializeField] private int maxHeight = 3;
@@ -22,10 +22,6 @@ public class RandomRooms : MonoBehaviour
     void Start()
     {
         PlaceRooms();
-        // Freeze the starting room
-        // GameObject startRoom = (GameObject)map[startPos];
-        // Rigidbody startRoomRigidbody = startRoom.GetComponent<Rigidbody>();
-        // startRoomRigidbody.isKinematic = true;
         
         // Debug.Log("Number of elements in location: " + location.Count);
         
@@ -56,7 +52,8 @@ public class RandomRooms : MonoBehaviour
     }
     void PlaceRooms()
     {
-        for (int i = 0; i < Mathf.Round(worldSize * worldSize / math.sqrt((maxLenght+1) * (maxDepth+1))+1); i++)
+        // for (int i = 0; i < Mathf.Round(worldSize * worldSize / math.sqrt((maxLenght+1) * (maxDepth+1))+1); i++)
+        for (int i = 0; i < 3; i++)
         {
             if (i == 0)
             {
@@ -89,76 +86,6 @@ public class RandomRooms : MonoBehaviour
             }
         }
     }
-    // bool collides(Vector3 pos, Vector3 roomSize)
-    // {
-    //     foreach (DictionaryEntry area in dungeon)
-    //     {
-    //         Vector3 areaPos = (Vector3)area.Key;
-    //         Vector3 areaSize = (Vector3)area.Value;
-
-    //         float minDistanceX = (roomSize.x * 0.5f) + (areaSize.x * 0.5f) + minSpace;
-    //         float minDistanceZ = (roomSize.z * 0.5f) + (areaSize.z * 0.5f) + minSpace;
-
-    //         if (Mathf.Abs(pos.x - startPos.x) < minDistanceX && Mathf.Abs(pos.z - startPos.z) < minDistanceZ)
-    //         {
-    //             return true;
-    //         }
-    //     }
-    //     return false;
-    // }
-    // void Contract()
-    // {
-    //      // Sorting rooms based on their distance to the starting room
-    //     List<Vector3> sortedRooms = new List<Vector3>(location.Keys.Cast<Vector3>());
-    //     sortedRooms.Sort((a, b) => Vector3.Distance(startPos, a).CompareTo(Vector3.Distance(startPos, b)));
-
-    //     foreach (Vector3 roomPos in sortedRooms)
-    //     {
-    //         // Skip the starting room
-    //         if (roomPos == startPos)
-    //             continue;
-
-    //         GameObject room = (GameObject)map[roomPos];
-    //         Rigidbody roomRigidbody = room.GetComponent<Rigidbody>();
-
-    //         if (roomRigidbody == null)
-    //         {
-    //             Debug.LogError("Room prefab must have a Rigidbody component.");
-    //             return;
-    //         }
-
-    //         Vector3 roomSize = (Vector3)location[roomPos];
-
-    //         // Calculate force direction towards the starting room
-    //         Vector3 forceDirection = new Vector3(-roomPos.x, 0, -roomPos.z);
-
-    //         // Apply a force to move the room
-    //         float forceMagnitude = 2f; // Adjust this value as needed
-    //         Vector3 force = forceDirection * forceMagnitude;
-    //         Debug.Log(force);
-
-    //         // Apply the force to the room's Rigidbody
-    //         roomRigidbody.AddForce(force, ForceMode.Force);
-
-    //         // Check for collisions after applying force
-    //         Vector3 newPosition = roomPos + force;
-    //         if (!collides(newPosition, roomSize))
-    //         {
-    //             // Room doesn't collide, update its position
-    //             location.Remove(roomPos);
-    //             location.Add(newPosition, roomSize);
-    //             map[newPosition] = map[roomPos];
-    //             map.Remove(roomPos);
-    //         }
-    //         else
-    //         {
-    //             // If there's a collision, stop the room's Rigidbody
-    //             location.Remove(roomPos);
-    //             roomRigidbody.isKinematic = true;
-    //             room.transform.SetLocalPositionAndRotation(new Vector3(Mathf.Round(roomPos.x), roomPos.y, Mathf.Round(roomPos.z)), quaternion.identity);
-    //         }
-    //     }
-    // }
     Vector3 Raymarch(Vector3 origin)
     {
         // 2. let the room raycast towards the starting room (startPos),
@@ -170,15 +97,27 @@ public class RandomRooms : MonoBehaviour
 
         if (Physics.Raycast(ray, out RaycastHit hit, math.sqrt(worldSize * worldSize + worldSize * worldSize), roomLayer, QueryTriggerInteraction.Ignore))
         {
-            Debug.DrawLine(origin, hit.point, Color.green, 60.0f);
-            return new Vector3(Mathf.Round(-hit.point.normalized.x), 1, Mathf.Round(-hit.point.normalized.z));
+            Debug.DrawLine(origin, hit.point.normalized, Color.green, 60.0f);
+            Vector3 target = new Vector3(Mathf.Round(-hit.point.normalized.x), 1, Mathf.Round(-hit.point.normalized.z));
 
             // 3. calculate the closest position by finding the vector with 
             // the opposite direction from the raycast and the lowest magnitude, 
             // from the raycast hit to a position where the current room fits without colliding with any other room while being surrounded by minSpace.
-            
+            if(target.x > 0)
+                target.x += minSpace;
+            if(target.x < 0)
+            target.x -= minSpace;
+
+            if(target.z > 0)
+            target.z += minSpace;
+            if(target.z < 0)
+            target.z -= minSpace;
+
+            Debug.DrawLine(hit.point.normalized, target, Color.blue, 60.0f);
+
+            return target;
         }else{
-            Debug.DrawLine(origin, (startPos - origin).normalized, Color.red, 60.0f);
+            Debug.DrawLine(origin, startPos, Color.red, 60.0f);
             Debug.LogWarning("Raycast " + origin + "did not hit anything.");
             return origin; // Return original position if no hit
         }
@@ -209,11 +148,6 @@ public class RandomRooms : MonoBehaviour
             //     sortedRooms.Remove(domain);
 
             // room.layer = roomLayer;
-            Delay();
         }
-    }
-
-    IEnumerator Delay(){
-        yield return new WaitForSeconds(3f);
     }
 }
