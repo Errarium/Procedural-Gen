@@ -1,12 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
-
 public class Triangle
 {
     public Vector3 a { get; private set; }
     public Vector3 b { get; private set; }
     public Vector3 c { get; private set; }
-
     public Triangle(Vector3 p1, Vector3 p2, Vector3 p3)
     {
         a = p1;
