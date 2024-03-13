@@ -25,7 +25,7 @@ public class DelaunayTriangulation
         return distanceToCircumcenter <= circumradius;
     }
 
-    public List<Triangle> Triangulate(List<Vector3> points, List<Triangle> triangulation)
+    public List<Triangle> BowyerWatson(List<Vector3> points, List<Triangle> triangulation)
     {
         // Step 1: Find minimum and maximum coordinates
         float minX = points.Min(p => p.x);

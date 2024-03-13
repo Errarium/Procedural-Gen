@@ -224,7 +224,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 769640709}
-  - component: {fileID: 769640708}
+  - component: {fileID: 769640710}
   m_Layer: 0
   m_Name: Map
   m_TagString: Untagged
@@ -232,25 +232,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &769640708
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 769640707}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0c9a7bdfc8ec9945b93abbe8d000669, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  worldSize: 15
-  prefab: {fileID: 3593349803396476467, guid: 08e83d3578800e94094154c3728f7f12, type: 3}
-  maxLenght: 3
-  maxHeight: 3
-  maxDepth: 3
-  minSpace: 1
-  roomLayer: 9
 --- !u!4 &769640709
 Transform:
   m_ObjectHideFlags: 0
@@ -266,6 +247,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &769640710
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 769640707}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3b859cfbc554364eab330dfebab0a6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  worldSize: 20
+  worldScale: 5
+  prefab: {fileID: 3593349803396476467, guid: 279cb34b436106349a4f10d3ac071cda, type: 3}
+  maxLenght: 3
+  maxHeight: 3
+  maxDepth: 3
+  minSpace: 0.4
 --- !u!1 &1045289014
 GameObject:
   m_ObjectHideFlags: 0
