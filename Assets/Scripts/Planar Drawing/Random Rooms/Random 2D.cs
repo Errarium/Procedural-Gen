@@ -156,7 +156,7 @@ public class Random2D : MonoBehaviour
                 rooms.Add(room.transform.position, room);
                 map.Add(room.transform.position, locSize); 
 
-                Debug.Log($"old position: {locRoom} | new position: {locRoom + adjust}");
+                // Debug.Log($"old position: {locRoom} | new position: {locRoom + adjust}");
             }
         }
     }
@@ -177,8 +177,8 @@ public class Random2D : MonoBehaviour
         // List<Edge> validEdges = DeleteIntersections(triangulation);
 
         // Implement Prim's algorithm to get a minimum spanning tree over the triangulation
-        // MinimumSpanningTree FindTree = new MinimumSpanningTree();
-        // List<Edge> MST = FindTree.Prims(triangulation);
+        MinimumSpanningTree FindTree = new MinimumSpanningTree();
+        HashSet<Edge> MST = FindTree.Prims(triangulation);
 
         // Visualize edges
         foreach (Triangle triangle in triangulation)
@@ -188,10 +188,10 @@ public class Random2D : MonoBehaviour
                 Debug.DrawLine(edge.a, edge.b, Color.red, 5f);
             }   
         }
-        // foreach (Edge edge in MST)
-        // {
-        //     Debug.DrawLine(edge.a, edge.b, Color.yellow, 60f);
-        // } 
+        foreach (Edge edge in MST)
+        {
+            Debug.DrawLine(edge.a, edge.b, Color.yellow, 60f);
+        } 
     }
 
     // private List<Edge> DeleteIntersections(List<Triangle> triangulation)
