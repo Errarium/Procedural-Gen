@@ -11,6 +11,7 @@ public class Random2D : MonoBehaviour
 {
     [SerializeField] public int worldSize = 10;
     [SerializeField] private int worldScale = 5;
+    [SerializeField] private int loopChance = 15;
     [SerializeField] public GameObject prefab;
     [SerializeField] private int maxLenght = 3;
     [SerializeField] private int maxHeight = 3;
@@ -27,7 +28,15 @@ public class Random2D : MonoBehaviour
     {
         PlaceRooms();   
         Contract();
-        
+
+        // map.Clear();
+        // foreach (DictionaryEntry entry in location)
+        // {
+        //     Vector3 position = (Vector3)entry.Key;
+        //     Vector3 size = (Vector3)entry.Value;
+        //     map.Add(position, size);
+        // }
+
         // Debug.Log("Number of elements in location: " + location.Count);
         
     }
@@ -167,10 +176,8 @@ public class Random2D : MonoBehaviour
         // Get points from the location hashtable
         List<Vector3> points = new List<Vector3>(map.Keys.Cast<Vector3>());        
 
-        // Create an instance of DelaunayTriangulation
+        // Use Boywer Watson's algorithm for DelaunayTriangulation
         DelaunayTriangulation Triangulate = new DelaunayTriangulation();
-        
-        // Triangulate using the instance
         List<Triangle> triangulation = Triangulate.BowyerWatson(points, new List<Triangle>());
 
         // Remove edges that are obstructed by a room depending on its size
@@ -178,20 +185,50 @@ public class Random2D : MonoBehaviour
 
         // Implement Prim's algorithm to get a minimum spanning tree over the triangulation
         MinimumSpanningTree FindTree = new MinimumSpanningTree();
-        HashSet<Edge> MST = FindTree.Prims(triangulation);
+        HashSet<Edge> tree = FindTree.Prims(triangulation);
 
-        // Visualize edges
+        // Add loops (edges in the triangulation not in tree)
+
+        HashSet<Edge> edges = new HashSet<Edge>();
+        HashSet<Edge> loops = new HashSet<Edge>();
+
+        // Extract all edges from the triangulation
         foreach (Triangle triangle in triangulation)
         {
-            foreach (Edge edge in triangle.GetEdges())
-            {
-                Debug.DrawLine(edge.a, edge.b, Color.red, 5f);
-            }   
+            edges.AddRange(triangle.GetEdges());
         }
-        foreach (Edge edge in MST)
+
+        float midWeight = (edges.Max(edge => edge.weight) + edges.Min(edge => edge.weight)) / 3;
+
+        foreach (Edge edge in edges)
+        {
+            if(tree.Contains(edge)){
+                continue;
+            }
+
+            if (edge.weight < midWeight)
+            {
+                int chance = UnityEngine.Random.Range(1,100);
+                if(chance <= loopChance)
+                    loops.Add(edge);
+            }
+        }
+
+
+        // Visualize edges
+        foreach (Edge edge in edges)
+        {
+            Debug.DrawLine(edge.a, edge.b, Color.red, 5f);
+            
+        }
+        foreach (Edge edge in tree)
         {
             Debug.DrawLine(edge.a, edge.b, Color.yellow, 60f);
         } 
+        foreach (Edge loop in loops)
+        {
+            Debug.DrawLine(loop.a, loop.b, Color.green, 15f);
+        }
     }
 
     // private List<Edge> DeleteIntersections(List<Triangle> triangulation)
