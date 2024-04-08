@@ -6,8 +6,8 @@ using System.Linq;
 using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Analytics;
-public class Random2D : MonoBehaviour
+using Random = UnityEngine.Random;
+public class Expand : MonoBehaviour
 {
     [SerializeField] public int worldSize = 10;
     [SerializeField] private int worldScale = 5;
@@ -17,7 +17,7 @@ public class Random2D : MonoBehaviour
     [SerializeField] private int maxHeight = 3;
     [SerializeField] private int maxDepth = 3;
     [SerializeField] private float minSpace = 1f;
-    private Hashtable location = new Hashtable();
+    private HashSet<(Vector3,Vector3)> location = new HashSet<(Vector3, Vector3)>();
     private Hashtable map = new Hashtable();
     private Hashtable rooms = new Hashtable();
     private Vector3 startSize;
@@ -25,21 +25,13 @@ public class Random2D : MonoBehaviour
     void Start()
     {
         PlaceRooms();   
-        // Contract();
-
-        map.Clear();
-        foreach (DictionaryEntry entry in location)
-        {
-            Vector3 position = (Vector3)entry.Key;
-            Vector3 size = (Vector3)entry.Value;
-            map.Add(position, size);
-        }
-
-        Debug.Log("Number of elements in location: " + location.Count);
         
+
     }
     void Update()
     {
+        
+        Expansion();
         if (Input.GetKeyUp(KeyCode.Space))
         {
             Debug.Log("Trigger");
@@ -75,24 +67,24 @@ public class Random2D : MonoBehaviour
                 startSize = new Vector3(2 * worldScale, 1, 2 * worldScale);
 
                 start.transform.localScale = startSize;
-
-                location.Add(startPos, startSize);
+                location.Add((startPos, startSize));
 
                 map.Add(startPos, startSize);
                 rooms.Add(startPos, start);
             }else{
                 Vector3 roomSize = new Vector3(
-                    Mathf.Round(UnityEngine.Random.Range(Mathf.Round(worldScale / 2),Mathf.Round((maxLenght + 1) * worldScale) / 2)) * 2, 
-                    Mathf.Round(UnityEngine.Random.Range(Mathf.Round(worldScale / 2),Mathf.Round((maxHeight + 1) * worldScale) / 2)) * 2,  
-                    Mathf.Round(UnityEngine.Random.Range(Mathf.Round(worldScale / 2),Mathf.Round((maxDepth + 1) * worldScale) / 2)) * 2
+                    Mathf.Round(Random.Range(Mathf.Round(worldScale / 2),Mathf.Round((maxLenght + 1) * worldScale) / 2)) * 2, 
+                    Mathf.Round(Random.Range(Mathf.Round(worldScale / 2),Mathf.Round((maxHeight + 1) * worldScale) / 2)) * 2,  
+                    Mathf.Round(Random.Range(Mathf.Round(worldScale / 2),Mathf.Round((maxDepth + 1) * worldScale) / 2)) * 2
                 );
+                float v = Random.Range(-1.99f, 1.01f);
                 Vector3 pos = new Vector3(
-                    Mathf.Round(UnityEngine.Random.Range(-worldSize * worldScale + roomSize.x * 0.5f, worldSize * worldScale - roomSize.x * 0.5f)), 
+                    (float)Math.Cos(v * Math.PI),
                     1, 
-                    Mathf.Round(UnityEngine.Random.Range(-worldSize * worldScale + roomSize.z * 0.5f, worldSize * worldScale - roomSize.z * 0.5f))
-                    );
+                    (float)Math.Sin(v * math.PI)
+                );
                 
-                if(Collides(pos, roomSize, location))
+                if(location.Contains((pos, roomSize)))
                 {
                     i -= 1;
                     continue;
@@ -104,66 +96,40 @@ public class Random2D : MonoBehaviour
 
                 room.transform.localScale = new Vector3(roomSize.x, 1, roomSize.z);
 
-                location.Add(pos, roomSize);
+                location.Add((pos, roomSize));
                 rooms.Add(pos, room);
             }
         }
     }
-    void Contract()
+    void Expansion()
     {
         // Step 0: Remove starting room from locations
-        location.Remove(startPos);
+        location.Remove((startPos, startSize));
 
-        // Step 4: Repeat for every room in locations
-        while (location.Count > 0)
+        // Step 3: Repeat for every room in locations
+        while(location.Count() > 0)
         {
-            // Step 1: Find the room with the position closest to any position of a room in map
-            Vector3 locRoom = new Vector3(worldSize * worldScale, worldSize * worldScale, worldSize * worldScale);
-            Vector3 mapRoom = new Vector3(-worldSize * worldScale, -worldSize * worldScale, -worldSize * worldScale);
+            foreach ((Vector3 locRoom, Vector3 locSize) in location)
+            {                
+                // Step 1: Move the room away from the starting room until it does not overlap
+                Vector3 deltaPos = startPos - locRoom;
+                Vector3 adjust = Vector3.zero;
 
-            foreach (Vector3 mapPos in map.Keys.Cast<Vector3>())
-            {
-                foreach (Vector3 locPos in location.Keys.Cast<Vector3>())
+                while (Collides(locRoom + adjust, locSize, map))
                 {
-                    if (Vector3.Distance(locPos, mapPos) < Vector3.Distance(locRoom, mapRoom))
-                    {
-                        locRoom = locPos;
-                        mapRoom = mapPos;
-                    }
+                    adjust += deltaPos;
                 }
-            } 
 
-            // Step 2: Move the room to the closest position to the nearest room in map without overlapping
-            Vector3 deltaPos = mapRoom - locRoom;
+                GameObject room = (GameObject)rooms[locRoom];
+                room.transform.position = new Vector3(Mathf.Round(adjust.x), Mathf.Round(adjust.y), Mathf.Round(adjust.z));
 
-            Vector3 locSize = (Vector3)location[locRoom];
-            Vector3 mapSize = (Vector3)map[mapRoom];
-            Vector3 margin = new Vector3(mapSize.x / 2 + locSize.x / 2 + minSpace * worldScale, 0, mapSize.z / 2 + locSize.z / 2 + minSpace * worldScale);
-            
-            Vector3 adjust = new Vector3(deltaPos.x + margin.x * Mathf.Sign(deltaPos.x) * -1, 0, deltaPos.z + margin.z * Mathf.Sign(deltaPos.z) * -1);
+                // Step 2: Remove room from locations and add to map
+                rooms.Remove(locRoom);
+                location.Remove((locRoom, locSize));   
 
-            if (Math.Abs(locRoom.x) - Math.Abs(mapRoom.x) < Math.Abs(locRoom.z) - Math.Abs(mapRoom.z))
-            {
-                adjust.x = mapRoom.x - locRoom.x;
-            } else{
-                adjust.z = mapRoom.z - locRoom.z;
-            }
-
-            // Step 3: Remove room from locations and add to map
-            GameObject room = (GameObject)rooms[locRoom];
-            room.transform.position += adjust;
-
-            rooms.Remove(locRoom);
-            location.Remove(locRoom);   
-
-            if (Collides(room.transform.position, locSize, map))
-            {
-                Destroy(room);
-            }else{
                 rooms.Add(room.transform.position, room);
                 map.Add(room.transform.position, locSize); 
 
-                // Debug.Log($"old position: {locRoom} | new position: {locRoom + adjust}");
             }
         }
     }
@@ -206,7 +172,7 @@ public class Random2D : MonoBehaviour
 
             if (edge.weight < midWeight)
             {
-                int chance = UnityEngine.Random.Range(1,100);
+                int chance = Random.Range(1,100);
                 if(chance <= loopChance)
                     loops.Add(edge);
             }
@@ -230,41 +196,4 @@ public class Random2D : MonoBehaviour
             Debug.DrawLine(loop.a, loop.b, Color.green, 15f);
         }
     }
-
-    // private List<Edge> DeleteIntersections(List<Triangle> triangulation)
-    // {
-    //     // Remove edges that intersect more than two rooms
-    //     List<Edge> validEdges = new List<Edge>();
-
-    //     foreach (Triangle triangle in triangulation)
-    //     {
-    //         foreach (Edge edge in triangle.GetEdges())
-    //         {
-    //             // Check if the edge intersects more than two rooms
-    //             int intersectedRooms = 0;
-
-    //             foreach (Vector3 roomPos in map.Keys.Cast<Vector3>())
-    //             {
-    //                 Vector3 roomSize = (Vector3)map[roomPos];
-    //                 Vector3 roomMin = roomPos - roomSize * 0.5f;
-    //                 Vector3 roomMax = roomPos + roomSize * 0.5f;
-
-    //                 if (edge.IntersectsRoom(roomMin, roomMax))
-    //                 {
-    //                     intersectedRooms++;
-
-    //                     if (intersectedRooms > 2)
-    //                         break; // No need to check further
-    //                 }
-    //             }
-
-    //             if (intersectedRooms == 2)
-    //             {
-    //                 // The edge intersects exactly two rooms, consider it as a valid edge
-    //                 validEdges.Add(edge);
-    //             }
-    //         }
-    //     }
-    //     return validEdges;
-    // }
 }

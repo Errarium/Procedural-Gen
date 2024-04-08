@@ -6,10 +6,9 @@ using System.Linq;
 using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Analytics;
-public class Random2D : MonoBehaviour
+public class Hallways : MonoBehaviour
 {
-    [SerializeField] public int worldSize = 10;
+        [SerializeField] public int worldSize = 10;
     [SerializeField] private int worldScale = 5;
     [SerializeField] private int loopChance = 15;
     [SerializeField] public GameObject prefab;
@@ -25,21 +24,11 @@ public class Random2D : MonoBehaviour
     void Start()
     {
         PlaceRooms();   
-        // Contract();
-
-        map.Clear();
-        foreach (DictionaryEntry entry in location)
-        {
-            Vector3 position = (Vector3)entry.Key;
-            Vector3 size = (Vector3)entry.Value;
-            map.Add(position, size);
-        }
-
-        Debug.Log("Number of elements in location: " + location.Count);
         
     }
     void Update()
     {
+        Contract();
         if (Input.GetKeyUp(KeyCode.Space))
         {
             Debug.Log("Trigger");
@@ -230,41 +219,4 @@ public class Random2D : MonoBehaviour
             Debug.DrawLine(loop.a, loop.b, Color.green, 15f);
         }
     }
-
-    // private List<Edge> DeleteIntersections(List<Triangle> triangulation)
-    // {
-    //     // Remove edges that intersect more than two rooms
-    //     List<Edge> validEdges = new List<Edge>();
-
-    //     foreach (Triangle triangle in triangulation)
-    //     {
-    //         foreach (Edge edge in triangle.GetEdges())
-    //         {
-    //             // Check if the edge intersects more than two rooms
-    //             int intersectedRooms = 0;
-
-    //             foreach (Vector3 roomPos in map.Keys.Cast<Vector3>())
-    //             {
-    //                 Vector3 roomSize = (Vector3)map[roomPos];
-    //                 Vector3 roomMin = roomPos - roomSize * 0.5f;
-    //                 Vector3 roomMax = roomPos + roomSize * 0.5f;
-
-    //                 if (edge.IntersectsRoom(roomMin, roomMax))
-    //                 {
-    //                     intersectedRooms++;
-
-    //                     if (intersectedRooms > 2)
-    //                         break; // No need to check further
-    //                 }
-    //             }
-
-    //             if (intersectedRooms == 2)
-    //             {
-    //                 // The edge intersects exactly two rooms, consider it as a valid edge
-    //                 validEdges.Add(edge);
-    //             }
-    //         }
-    //     }
-    //     return validEdges;
-    // }
 }
