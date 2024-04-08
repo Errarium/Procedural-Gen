@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class MeshGenerator : MonoBehaviour
+public class SimpleMeshGenerator : MonoBehaviour
 {
     public int WorldX;
     public int WorldZ;

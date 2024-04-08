@@ -113,8 +113,8 @@ public class Force : MonoBehaviour
         {
             // Step 1: Find the room with the position closest to any position of a room in map
             Vector3 locRoom = new Vector3(worldSize * worldScale, worldSize * worldScale, worldSize * worldScale);
-            Vector3 locSize = Vector3.zero;
             Vector3 mapRoom = new Vector3(-worldSize * worldScale, -worldSize * worldScale, -worldSize * worldScale);
+            Rigidbody roomRigidbody;
 
             foreach (Vector3 mapPos in map.Keys.Cast<Vector3>())
             {
@@ -127,10 +127,23 @@ public class Force : MonoBehaviour
                     }
                 }
             } 
-            locSize = (Vector3)location[locRoom];
+            Vector3 locSize = (Vector3)location[locRoom];
+
+            foreach (Vector3 entry in rooms.Keys)
+            {
+                if(entry == locRoom)
+                    Debug.Log("Match found");
+            }
            
             GameObject room = (GameObject)rooms[locRoom];
-            Rigidbody roomRigidbody = room.GetComponent<Rigidbody>(); // this is line 133
+
+            if (room != null)
+            {
+                Debug.LogError("Room exists");
+            }else{
+                Debug.LogError("Room does not exist");
+            }
+            roomRigidbody = room.GetComponent<Rigidbody>(); // this is line 132
 
             if (roomRigidbody == null)
             {
@@ -150,18 +163,20 @@ public class Force : MonoBehaviour
             roomRigidbody.AddForce(force, ForceMode.Force);
 
             // Check for collisions after applying force
-            Vector3 newPosition = locRoom + force;
+            Vector3 newPosition = new Vector3(Mathf.Round(locRoom.x + force.x), Mathf.Round(locRoom.y + force.y), Mathf.Round(locRoom.z + force.z));
             if (!Collides(newPosition, locSize, map))
             {
                 // Room doesn't collide, update its position
                 location.Remove(locRoom);
                 location.Add(newPosition, locSize);
-                map[newPosition] = map[locRoom];
                 map.Remove(locRoom);
+                map.Add(locRoom, locSize);
             }else{
                 // If there's a collision, stop the room's Rigidbody
                 location.Remove(locRoom);
+                map.Remove(locRoom);
                 map.Add(newPosition, locSize);
+
                 roomRigidbody.isKinematic = true;
                 room.transform.SetLocalPositionAndRotation(new Vector3(Mathf.Round(locRoom.x), locRoom.y, Mathf.Round(locRoom.z)), quaternion.identity);
             }

@@ -305,7 +305,7 @@ GameObject:
   - component: {fileID: 1051122065}
   - component: {fileID: 1051122064}
   m_Layer: 0
-  m_Name: WorldMap
+  m_Name: PlaneMap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -323,11 +323,54 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ceade5365ab6f0a44bbdaf139cfa75a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  plane: {fileID: 3522942190859413524, guid: 7f328ff3a19137a4392f5ea350716644, type: 3}
+  plane: {fileID: 3577691240121418309, guid: b039b501f63a675459e5c3dd958f314d, type: 3}
   player: {fileID: 1171914590}
-  amp: 5
-  freq: 10
-  radius: 5
+  plants:
+  - {fileID: 2940557043030206389, guid: bfe27f8cafcf4ee48b93d84baa8389f3, type: 3}
+  - {fileID: 1196787590941772358, guid: 4a37d39bea4517644b027dd51ce68252, type: 3}
+  - {fileID: 3853006350848721261, guid: 13db1919278a0e74db4dcc7d8e260718, type: 3}
+  - {fileID: 6141652758128337264, guid: d45e9e9837680e8448990bc088ba7b07, type: 3}
+  - {fileID: 2275399831387296705, guid: 80134143588e09c4892e00879262fce3, type: 3}
+  - {fileID: 1440842809721556268, guid: 7f64a0835a6710a4180889767a4b49af, type: 3}
+  rocks:
+  - {fileID: 7029850886562106122, guid: 73a57c0239d62ab4bac716cfb042f007, type: 3}
+  - {fileID: 7088034624560197325, guid: 02323f354a4cb6343a4c4466e3cabdcb, type: 3}
+  - {fileID: 5697841515233404336, guid: 8bbe7b3e713af194f8d3a0cec42279c9, type: 3}
+  amp: 15
+  freq: 30
+  seed: 1
+  radius: 7
+  density: 10
+  heightGradient:
+    serializedVersion: 2
+    key0: {r: 0.3882353, g: 0.14689647, b: 0.027450986, a: 1}
+    key1: {r: 0.7924528, g: 0.54725647, b: 0.0037379938, a: 1}
+    key2: {r: 0.7219868, g: 0.735849, b: 0.05206478, a: 0}
+    key3: {r: 0.2411289, g: 0.6981132, b: 0.09549664, a: 0}
+    key4: {r: 0.34090045, g: 0.735849, b: 0.12148449, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 16384
+    ctime2: 26214
+    ctime3: 32768
+    ctime4: 65535
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 5
+    m_NumAlphaKeys: 2
 --- !u!4 &1051122065
 Transform:
   m_ObjectHideFlags: 0
@@ -337,7 +380,7 @@ Transform:
   m_GameObject: {fileID: 1051122063}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -477,7 +520,7 @@ Transform:
   m_GameObject: {fileID: 1171914590}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 5, z: 0}
+  m_LocalPosition: {x: 0, y: 50, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -672,7 +715,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: 0.01
   far clip plane: 1000
   field of view: 60
   orthographic: 0
@@ -701,7 +744,7 @@ Transform:
   m_GameObject: {fileID: 1941168873}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.75, z: 0}
+  m_LocalPosition: {x: 0, y: 2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
