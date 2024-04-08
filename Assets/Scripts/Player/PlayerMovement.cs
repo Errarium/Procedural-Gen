@@ -6,6 +6,8 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+    public GameObject lake;
+
     [Header("Movement")]
     public float moveSpeed;
     public float groundDrag;
@@ -57,6 +59,7 @@ public class PlayerMovement : MonoBehaviour
     private void FixedUpdate()
     {
         MovePlayer();
+        lake.transform.position = new Vector3(orientation.transform.position.x, 4, orientation.transform.position.z);
     }
 
     private void MoveInput()
