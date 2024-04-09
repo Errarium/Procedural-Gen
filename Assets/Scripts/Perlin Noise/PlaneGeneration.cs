@@ -33,7 +33,11 @@ public class PlaneGeneration : MonoBehaviour
     private Hashtable map = new Hashtable();
     public float minHeight = float.MaxValue;
     public float maxHeight = float.MinValue;
-
+    private void Start()
+    {
+        minHeight = - (amp1+amp2+amp3) / 2;
+        maxHeight = (amp1+amp2+amp3) / 2;
+    }
     private void Update()
     {
         if (startPos == Vector3.zero)
@@ -59,11 +63,23 @@ public class PlaneGeneration : MonoBehaviour
         }
         startPos = player.transform.position;
     }
+    private float NoiseMap(float x, float y)
+    {
+        // float height = Mathf.PerlinNoise((pos.x + ) / freq1, (pos.z + vertices[i].z) / freq1) * amp1 - math.sqrt(amp1);
+        // height += Mathf.PerlinNoise((pos.x + vertices[i].x) / freq2, (pos.z + vertices[i].z) / freq2) * amp2 - 2* math.sqrt(amp2);
+        // height += Mathf.PerlinNoise((pos.x + vertices[i].x) / freq3, (pos.z + vertices[i].z) / freq3) * amp3 - 4;
 
+        float height = Mathf.PerlinNoise(x / freq1, y / freq1) * amp1 - math.sqrt(amp1);
+        height += Mathf.PerlinNoise(x / freq2, y / freq2) * amp2 - 2* math.sqrt(amp2);
+        height += Mathf.PerlinNoise(x / freq3, y / freq3) * amp3 - 4;
+
+        return height;
+    }
     private void GeneratePlane(Vector3 pos)
     {
         if (!map.Contains(pos))
         {
+            pos.y = NoiseMap(pos.x, pos.z);
             GameObject _plane = Instantiate(plane, pos, Quaternion.identity);
             _plane.transform.SetParent(this.transform);
 
@@ -76,15 +92,9 @@ public class PlaneGeneration : MonoBehaviour
 
                 for (int i = 0; i < vertices.Length; i++)
                 {
-                    float height = Mathf.PerlinNoise((pos.x + vertices[i].x) / freq1, (pos.z + vertices[i].z) / freq1) * amp1 - math.sqrt(amp1);
-                    height += Mathf.PerlinNoise((pos.x + vertices[i].x) / freq2, (pos.z + vertices[i].z) / freq2) * amp2 - 2* math.sqrt(amp2);
-                    height += Mathf.PerlinNoise((pos.x + vertices[i].x) / freq3, (pos.z + vertices[i].z) / freq3) * amp3 - 4;
-                    vertices[i].y = height;
-
-                    if (height < minHeight)
-                        minHeight = height;
-                    if (height > maxHeight)
-                        maxHeight = height;
+                    float height = NoiseMap(pos.x + vertices[i].x, pos.z + vertices[i].z);
+                    
+                    vertices[i].y = height - pos.y;
                 }
                 mesh.vertices = vertices;
                 mesh.RecalculateNormals();
@@ -93,7 +103,7 @@ public class PlaneGeneration : MonoBehaviour
                 Color[] colors = new Color[vertices.Length];
                 for (int i = 0; i < vertices.Length; i++)
                 {
-                    colors[i] = heightGradient.Evaluate(Mathf.InverseLerp(minHeight, maxHeight, vertices[i].y));
+                    colors[i] = heightGradient.Evaluate(Mathf.InverseLerp(minHeight, maxHeight, vertices[i].y)); // adjust colors
                 }
                 mesh.colors = colors;
 
@@ -108,7 +118,7 @@ public class PlaneGeneration : MonoBehaviour
                 meshCollider.sharedMesh = meshFilter.mesh;
             }
 
-            map.Add(pos, _plane);
+            map.Add(new Vector3(pos.x, 0, pos.z), _plane);
         }
     }
 
