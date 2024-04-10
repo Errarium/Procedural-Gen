@@ -21,6 +21,8 @@ public class PlaneGeneration : MonoBehaviour
     [SerializeField] public int freq2 = 5;
     [SerializeField] public int freq3 = 5;
     [SerializeField] private int seed = 0;
+    private float seedAmp;
+    private float seedFreq;
     [SerializeField] private int radius = 5;
     [SerializeField] private int density = 10;
     [SerializeField] private Gradient heightGradient;
@@ -35,8 +37,13 @@ public class PlaneGeneration : MonoBehaviour
     public float maxHeight = float.MinValue;
     private void Start()
     {
-        minHeight = - (amp1+amp2+amp3) / 2;
-        maxHeight = (amp1+amp2+amp3) / 2;
+        Random.InitState(seed); // Seed the random number generator
+
+        seedAmp = Random.Range(2, 4);
+        seedFreq = Random.Range(2 * seedAmp, 4 * seedAmp);
+
+        minHeight = -(amp1 + amp2 + amp3 + seedAmp) / 2;
+        maxHeight = (amp1 + amp2 + amp3 + seedAmp) / 2;
     }
     private void Update()
     {
@@ -65,13 +72,12 @@ public class PlaneGeneration : MonoBehaviour
     }
     private float NoiseMap(float x, float y)
     {
-        // float height = Mathf.PerlinNoise((pos.x + ) / freq1, (pos.z + vertices[i].z) / freq1) * amp1 - math.sqrt(amp1);
-        // height += Mathf.PerlinNoise((pos.x + vertices[i].x) / freq2, (pos.z + vertices[i].z) / freq2) * amp2 - 2* math.sqrt(amp2);
-        // height += Mathf.PerlinNoise((pos.x + vertices[i].x) / freq3, (pos.z + vertices[i].z) / freq3) * amp3 - 4;
+        float height = Mathf.PerlinNoise(x / freq1, y / freq1) * amp1;
+        height += Mathf.PerlinNoise(x / freq2, y / freq2) * amp2;
+        height += Mathf.PerlinNoise(x / freq3, y / freq3) * amp3;
+        height += Mathf.PerlinNoise(x / seedFreq, y / seedFreq) * seedAmp;
 
-        float height = Mathf.PerlinNoise(x / freq1, y / freq1) * amp1 - math.sqrt(amp1);
-        height += Mathf.PerlinNoise(x / freq2, y / freq2) * amp2 - 2* math.sqrt(amp2);
-        height += Mathf.PerlinNoise(x / freq3, y / freq3) * amp3 - 4;
+        height += minHeight;
 
         return height;
     }
@@ -93,7 +99,7 @@ public class PlaneGeneration : MonoBehaviour
                 for (int i = 0; i < vertices.Length; i++)
                 {
                     float height = NoiseMap(pos.x + vertices[i].x, pos.z + vertices[i].z);
-                    
+
                     vertices[i].y = height - pos.y;
                 }
                 mesh.vertices = vertices;
@@ -103,7 +109,7 @@ public class PlaneGeneration : MonoBehaviour
                 Color[] colors = new Color[vertices.Length];
                 for (int i = 0; i < vertices.Length; i++)
                 {
-                    colors[i] = heightGradient.Evaluate(Mathf.InverseLerp(minHeight, maxHeight, vertices[i].y)); // adjust colors
+                    colors[i] = heightGradient.Evaluate(Mathf.InverseLerp(minHeight / 2, maxHeight / 2, vertices[i].y)); // adjust colors
                 }
                 mesh.colors = colors;
 
@@ -124,8 +130,6 @@ public class PlaneGeneration : MonoBehaviour
 
     private void GenerateObjectsWithinPlane(Vector3 planePos, Vector3[] vertices)
     {
-        //Random.InitState(seed); // Seed the random number generator
-
         int locDensity = 0;
         List<Vector3> objLocations = new List<Vector3>();
 
@@ -142,13 +146,20 @@ public class PlaneGeneration : MonoBehaviour
             if (objPos.y < 1)
             {
                 GameObject obj = underwaterObjs[Random.Range(0, underwaterObjs.Length)];
-                Instantiate(obj, objPos, Quaternion.identity);
+
+                // Instantiate the object at the selected position with the same Y position as the plane
+                GameObject _obj = Instantiate(obj, objPos, Quaternion.Euler(Vector3.up * Random.Range(0, 360)));
+                _obj.transform.SetParent(this.transform);
+
                 locDensity += 4;
-            }else{
+            }
+            else
+            {
                 GameObject obj = Random.value < 0.5f ? bigObjs[Random.Range(0, bigObjs.Length)] : smObjs[Random.Range(0, smObjs.Length)];
 
                 // Instantiate the object at the selected position with the same Y position as the plane
-                Instantiate(obj, objPos, Quaternion.identity);
+                GameObject _obj = Instantiate(obj, objPos, Quaternion.Euler(Vector3.up * Random.Range(0, 360)));
+                _obj.transform.SetParent(this.transform);
 
                 objLocations.Add(objPos);
 

@@ -46,17 +46,20 @@ public class FPSController : MonoBehaviour
         float movementDirectionY = moveDirection.y;
         moveDirection = (forward * curSpeedX) + (right * curSpeedY);
 
+        if ( this.transform.position.y < 0)
+            moveDirection *= 0.8f;
+
         lake.transform.position = new Vector3(this.transform.position.x, lakeLevel, this.transform.position.z);
 
         #endregion
 
         #region Handles Jumping
-        if (Input.GetButton("Jump") && canMove && characterController.isGrounded && this.transform.position.z > 0 || Input.GetButton("Jump") && canMove && this.transform.position.z < 0)
-        {
-            if ( this.transform.position.y > 0)
-                moveDirection.y = jumpPower;
+        if (Input.GetButton("Jump") && canMove && characterController.isGrounded || Input.GetButton("Jump") && this.transform.position.y < 0)
+        {                   
+            moveDirection.y = jumpPower;
+
             if ( this.transform.position.y < 0)
-                moveDirection.y = jumpPower / 2;
+                moveDirection.y *= 0.8f;
         }
         else
         {
