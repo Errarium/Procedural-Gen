@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Mathematics;
+using Unity.Transforms;
 using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -60,6 +61,7 @@ public class PlaneGeneration : MonoBehaviour
     private void GenerateWorld()
     {
         ClearInactivePlanes();
+        // ClearOutOfBounds();
         for (int x = -radius; x <= radius; x++)
         {
             for (int z = -radius; z <= radius; z++)
@@ -109,7 +111,9 @@ public class PlaneGeneration : MonoBehaviour
                 Color[] colors = new Color[vertices.Length];
                 for (int i = 0; i < vertices.Length; i++)
                 {
-                    colors[i] = heightGradient.Evaluate(Mathf.InverseLerp(minHeight / 2, maxHeight / 2, vertices[i].y)); // adjust colors
+                    colors[i] = heightGradient.Evaluate(Mathf.InverseLerp(minHeight / 2, maxHeight / 2, vertices[i].y + pos.y)); // adjust colors
+
+                    Debug.Log($"{minHeight / 2}, {maxHeight / 2}, {vertices[i].y + pos.y}");
                 }
                 mesh.colors = colors;
 
@@ -151,6 +155,8 @@ public class PlaneGeneration : MonoBehaviour
                 GameObject _obj = Instantiate(obj, objPos, Quaternion.Euler(Vector3.up * Random.Range(0, 360)));
                 _obj.transform.SetParent(this.transform);
 
+                // map.Add(new Vector3(objPos.x, 0, objPos.z), _obj);
+
                 locDensity += 4;
             }
             else
@@ -163,6 +169,8 @@ public class PlaneGeneration : MonoBehaviour
 
                 objLocations.Add(objPos);
 
+                // map.Add(new Vector3(objPos.x, 0, objPos.z), _obj);
+
                 if (bigObjs.Contains(obj))
                     locDensity += 6;
                 else
@@ -171,7 +179,18 @@ public class PlaneGeneration : MonoBehaviour
         }
     }
 
-
+    // private void ClearOutOfBounds()
+    // {
+    //     foreach (GameObject gameObject in map.Values)
+    //     {
+    //         bool beyondRadius = Mathf.Abs(gameObject.transform.position.x - pLocX) > radius * planeOffset || Mathf.Abs(gameObject.transform.position.z - pLocZ) > radius * planeOffset;
+    //         if (beyondRadius)
+    //         {
+    //             map.Remove(gameObject.transform.position);
+    //             Destroy(gameObject);
+    //         }
+    //     }
+    // }
     private void ClearInactivePlanes()
     {
         List<Vector3> positionsToRemove = new List<Vector3>();
