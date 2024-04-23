@@ -58,13 +58,14 @@ This scene demonstrates procedural terrain generation with dynamic object placem
 ## Scene - Planar graph no crossings
 This scene explores procedural room generation. No rooms overlapp.
 
-After the placement of the rooms connections between them are created. Connections are made by triangulating using Boywer Watsons algorithm for delaunary triangulation.
+After the placement of the rooms connections between them are created. Connections are made by triangulating using Boywer Watsons algorithm for delaunary triangulation. Then finding the minimum spanning tree for the triangulation using Prim's algorithm. Lastly loops are added by iterating over all edges in the triangulation but not in the minimum spanning tree.
 
 ### Random
 
-1. Rooms of random size are placed in the world.
-2. If a room would be placed intersecting annother room the room is regenerated with annother size and position.
-3. When all rooms have been placed connections between rooms can be showed by pressing space.
+1. A starting room is placed.
+2. Rooms of random size are placed in the world.
+3. If a room would be placed intersecting annother room the room is regenerated with annother size and position.
+4. When all rooms have been placed connections between rooms can be showed by pressing space.
 
 ### Features
 
@@ -74,7 +75,9 @@ After the placement of the rooms connections between them are created. Connectio
 
 ### Expand
 
-
+1. Rooms of random size are placed in a circle around the starting room.
+2. Then rooms are moved away from the starting room until they no longer overlap.
+3. When all rooms have been placed connections between rooms can be showed by pressing space.
 
 ### Features
 
