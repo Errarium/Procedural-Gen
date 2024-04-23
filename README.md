@@ -56,15 +56,27 @@ This scene demonstrates procedural terrain generation with dynamic object placem
 - Automatic removal of out-of-bounds objects to optimize performance
 
 ## Scene - Planar graph no crossings
-This scene explores procedural room generation. Each room is connected by a minimum spanning tree so tahat all rooms are accessable. No rooms overlapp.
+This scene explores procedural room generation. No rooms overlapp.
+
+After the placement of the rooms connections between them are created. Connections are made by triangulating using Boywer Watsons algorithm for delaunary triangulation.
 
 ### Random
+
+1. Rooms of random size are placed in the world.
+2. If a room would be placed intersecting annother room the room is regenerated with annother size and position.
+3. When all rooms have been placed connections between rooms can be showed by pressing space.
+
+### Features
 
 - Procedural room generation
 - Random room size and location
 - Loops occur
 
 ### Expand
+
+
+
+### Features
 
 - Procedural room generation
 - Random room size and location
